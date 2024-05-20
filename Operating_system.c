@@ -44,6 +44,24 @@ void writeOutput(char message[]) {
     fclose(fPointer);
 }
 
+void FCFS(CPU* cpu1, int index, int remainingMemoryForThisCpu) {
+    char message[50];
+    if (remainingMemoryForThisCpu < cpu1->que1[index].ram) {
+        sprintf_s(message, sizeof(message), "Process %s is exceeding RAM for CPU-1.", cpu1->que1[index].process_number);
+        writeOutput(message);
+    }
+    else {
+        int initialMemory = remainingMemoryForThisCpu;
+        sprintf_s(message, sizeof(message), "Process %s is assigned to CPU-1.", cpu1->que1[index].process_number);
+        writeOutput(message);
+        remainingMemoryForThisCpu -= cpu1->que1[index].ram;
+        sprintf_s(message, sizeof(message), "Process %s is completed and terminated.\n", cpu1->que1[index].process_number);
+        writeOutput(message);
+        remainingMemoryForThisCpu = initialMemory;
+        cpu1->que1[index].isDone = true;
+    }
+}
+
 
 
 void runCpu1(CPU* cpu1, int remainingMemoryForThisCpu) {
