@@ -61,6 +61,53 @@ void FCFS(CPU* cpu1, int index, int remainingMemoryForThisCpu) {
         cpu1->que1[index].isDone = true;
     }
 }
+
+void SJF(CPU* cpu2, int* remainingMemoryForThisCpu) {
+    // Sort the processes in the queue based on burst time and CPU rate (shortest job first)
+    for (int i = 0; i < cpu2->num_processes_que2 - 1; i++) {
+        for (int j = 0; j < cpu2->num_processes_que2 - i - 1; j++) {
+            // Calculate the completion time for each process based on burst time and CPU rate
+            float completionTime1 = (float)cpu2->que2[j].burst_time / cpu2->que2[j].cpu_rate;
+            float completionTime2 = (float)cpu2->que2[j + 1].burst_time / cpu2->que2[j + 1].cpu_rate;
+
+            // Compare completion times to determine the order
+            if (completionTime1 > completionTime2) {
+                // Swap the processes
+                Process temp = cpu2->que2[j];
+                cpu2->que2[j] = cpu2->que2[j + 1];
+                cpu2->que2[j + 1] = temp;
+            }
+        }
+    }
+    // Execute the processes
+    for (int i = 0; i < cpu2->num_processes_que2; i++) {
+        if (!cpu2->que2[i].isDone) {
+            // Check if there is enough remaining memory for the process
+            if (*remainingMemoryForThisCpu >= cpu2->que2[i].ram) {
+                char message[50];
+                sprintf_s(message, sizeof(message), "Process %s is assigned to CPU-2.", cpu2->que2[i].process_number);
+                writeOutput(message);
+
+                // Simulate the execution by deducting burst time from remaining memory
+                *remainingMemoryForThisCpu -= cpu2->que2[i].burst_time;
+                sprintf_s(message, sizeof(message), "Process %s is completed and terminated.\n", cpu2->que2[i].process_number);
+                writeOutput(message);
+
+                // the process is done
+                cpu2->que2[i].isDone = true;
+                // Add the memory used by the process back to the remaining memory
+                *remainingMemoryForThisCpu += cpu2->que2[i].ram;
+            }
+            else {
+                char message[50];
+                sprintf_s(message, sizeof(message), "Insufficient RAM for Process %s in CPU-2.\n", cpu2->que2[i].process_number);
+                writeOutput(message);
+            }
+        }
+    }
+}
+
+
 void Round_Robin(CPU* cpu, int* remainingMemoryForThisCpu, int quantum_time, int queue_num) {
     char message[100];
     int num_processes;
