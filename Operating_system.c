@@ -61,7 +61,45 @@ void FCFS(CPU* cpu1, int index, int remainingMemoryForThisCpu) {
         cpu1->que1[index].isDone = true;
     }
 }
+void Round_Robin(CPU* cpu, int* remainingMemoryForThisCpu, int quantum_time, int queue_num) {
+    char message[100];
+    int num_processes;
+    Process* queue;
 
+    switch (queue_num) {
+    case 3:
+        queue = cpu->que3;
+        num_processes = cpu->num_processes_que3;
+        break;
+    case 4:
+        queue = cpu->que4;
+        num_processes = cpu->num_processes_que4;
+        break;
+    default:
+        return; // Invalid queue number
+    }
+
+    for (int i = 0; i < num_processes; i++) {
+        if (!queue[i].isDone) {
+            if (queue[i].burst_time <= quantum_time) {
+                sprintf_s(message, sizeof(message), "Process %s is assigned to CPU-2.", queue[i].process_number);
+                writeOutput(message);
+                *remainingMemoryForThisCpu -= queue[i].burst_time;
+                sprintf_s(message, sizeof(message), "Process %s is completed and terminated.\n", queue[i].process_number);
+                writeOutput(message);
+                queue[i].isDone = true;
+                *remainingMemoryForThisCpu += queue[i].ram;
+            }
+            else {
+                sprintf_s(message, sizeof(message), "Process %s is assigned to CPU-2.", queue[i].process_number);
+                writeOutput(message);
+                queue[i].burst_time -= quantum_time;
+                sprintf_s(message, sizeof(message), "Process %s is preempted.\n", queue[i].process_number);
+                writeOutput(message);
+            }
+        }
+    }
+}
 
 
 void runCpu1(CPU* cpu1, int remainingMemoryForThisCpu) {
