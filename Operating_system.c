@@ -31,8 +31,17 @@ typedef struct {
     int num_processes_que4;
 } CPU;
 
-char last[10];;
+char last[10];
 
+void clearOutputFile() {
+    FILE* fPointer;
+    fopen_s(&fPointer, "output.txt", "w");
+    if (fPointer == NULL) {
+        printf("Error opening file.\n");
+        return;
+    }
+    fclose(fPointer);
+}
 void writeOutput(char message[]) {
     FILE* fPointer;
     fopen_s(&fPointer, "output.txt", "a");
@@ -178,25 +187,25 @@ void printSummary(CPU* cpu1, CPU* cpu2) {
     int queue3Size = cpu2->num_processes_que3;
     int queue4Size = cpu2->num_processes_que4;
 
-    fprintf(fPointer, "CPU-1 que1(priority-0) (FCFS)→");
+    fprintf(fPointer, "CPU-1 que1(priority-0) (FCFS) = ");
     for (int i = 0; i < queue1Size; i++) {
         fprintf(fPointer, "%s, ", cpu1->que1[i].process_number);
     }
     fprintf(fPointer, "...\n");
 
-    fprintf(fPointer, "CPU-2 que2(priority-1) (SJF)→");
+    fprintf(fPointer, "CPU-2 que2(priority-1) (SJF) = ");
     for (int i = 0; i < queue2Size; i++) {
         fprintf(fPointer, "%s, ", cpu2->que2[i].process_number);
     }
     fprintf(fPointer, "...\n");
 
-    fprintf(fPointer, "CPU-2 que3(priority-2) (RR-q8)→");
+    fprintf(fPointer, "CPU-2 que3(priority-2) (RR-q8) = ");
     for (int i = 0; i < queue3Size; i++) {
         fprintf(fPointer, "%s, ", cpu2->que3[i].process_number);
     }
     fprintf(fPointer, "...\n");
 
-    fprintf(fPointer, "CPU-2 que4(priority-3) (RR-q16)→");
+    fprintf(fPointer, "CPU-2 que4(priority-3) (RR-q16) = ");
     for (int i = 0; i < queue4Size; i++) {
         fprintf(fPointer, "%s, ", cpu2->que4[i].process_number);
     }
@@ -237,7 +246,7 @@ void readFile(CPU* cpu1, CPU* cpu2) {
             runCpu2(cpu2, &ramForCpu2); // Execute CPU 2 tasks
         }
 
-        strcpy_s(last, process.process_number);
+        strcpy_s(last, sizeof(last), process.process_number);
 
         // Enqueue processes into the appropriate queue based on priority status
         if (process.priority == 0) {
@@ -284,6 +293,7 @@ void readFile(CPU* cpu1, CPU* cpu2) {
 }
 
 int main() {
+    clearOutputFile();
     CPU cpu1;
     CPU cpu2;
 
